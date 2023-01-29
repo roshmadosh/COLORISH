@@ -25,7 +25,6 @@ public class App {
 
     public static void main(String[] args) throws IOException {
 		String imagePath = App.class.getClassLoader().getResource("react.png").getPath();
-		System.out.println(imagePath);
 		File file = new File(imagePath);
 		BufferedImage buf = ImageIO.read(file);
 		BufferedImage resized = resizeBufferedImage(buf, 50, 50);
@@ -37,6 +36,14 @@ public class App {
 		
 		for (Map.Entry<Color, Integer> entry : subset) {
 			System.out.println("COLOR: " + entry.getKey() + " COUNT " + entry.getValue());
+		}
+
+		RgbKMeans rgbKMeans = new RgbKMeans();
+		rgbKMeans.fit(generatePixels(resized), 3, 10.00, 3);
+		try {
+			rgbKMeans.generateClusters();
+		} catch (KMeansException e) {
+			e.printStackTrace();
 		}
 	
 	}
@@ -72,6 +79,16 @@ public class App {
 
 		return sortMapByValueCount(valueCounts);
 
+	}
+
+	static List<Color> generatePixels(BufferedImage img) {
+		List<Color> pixels = new ArrayList<>();
+		for (int y = 0; y < img.getHeight(); y++) {
+			for (int x = 0; x < img.getWidth(); x++) {
+				int pixel = img.getRGB(x, y);
+				pixels.add(new Color(pixel, true));
+			}
+		} return pixels;
 	}
 
 

@@ -7,5 +7,5 @@
 <span style="font-size: 48px, color: #1c6373">S</span>
 <span style="font-size: 48px, color: #2a4858">H</span>
 ---
-A Java-based application that takes an image and extracts its most prominent colors. Intended to assist in web development   
+A Java-based application that takes an image and extracts its most prominent colors. Intended to assist in web development 
 by providing context to a color palette or theme.
