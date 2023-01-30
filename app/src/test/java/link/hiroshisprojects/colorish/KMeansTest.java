@@ -20,27 +20,20 @@ public class KMeansTest {
 
 	@BeforeEach
 	public void init() {
-
+		
 		kMeans = new RgbKMeans();
 		
 		List<Color> pixels = new ArrayList<>();
 
 		pixels.add(Color.RED);
-		pixels.add(Color.RED);
-		pixels.add(Color.RED);
+		pixels.add(Color.GREEN);
+		pixels.add(Color.BLUE);
 
 		int K = 3;
 		double distance = 0.0;
 		int maxIters = 2;
 		
 		kMeans.fit(pixels, K, distance, maxIters);
-
-	}
-
-	@AfterEach
-	public void destroy() {
-
-		kMeans = null;
 
 	}
 
@@ -99,41 +92,19 @@ public class KMeansTest {
 
 		centroids.add(Color.GREEN);
 
-		Color pixel = Color.GREEN;
+		Color pixel = Color.RED;
 
 		kMeans.setCentroids(centroids);
 
 		Color actualCentroid = kMeans.findNearestCentroid(pixel);
 
-		assertEquals(Color.GREEN, actualCentroid);
+		assertEquals(Color.RED, actualCentroid);
 
 	}
 
-	@Test
-	public void whenAssignPixelToEmptyCluster_thenClustersUpdated() {
-
-		Color centroid = Color.WHITE;
-
-		Color pixel = Color.WHITE;
-
-		Map<Color, List<Color>> initialClusters = new HashMap<>();
-
-		kMeans.setClusters(initialClusters);
-
-		assert(kMeans.getClusters()).isEmpty();
-
-		Map<Color, List<Color>> expectedClusters = new HashMap<>();
-
-		kMeans.assignPixelToCluster(centroid, pixel);
-
-		expectedClusters.put(centroid, new ArrayList<>(Arrays.asList(pixel)));
-
-		assertEquals(expectedClusters, kMeans.getClusters());	
-
-	}
 
 	@Test
-	public void whenAssignPixelToExistingCluster_thenClustersUpdated() {
+	public void givenExistingCluster_whenUpdateClusters_thenClustersUpdated() {
 
 		/* ARRANGE */
 		Color centroid = Color.WHITE;
@@ -157,7 +128,7 @@ public class KMeansTest {
 		kMeans.setClusters(initialClusters);
 
 		/* ACT */
-		kMeans.assignPixelToCluster(centroid, pixel);
+		kMeans.updateClusters(centroid, pixel);
 
 		 
 		/* ASSERT */
@@ -166,16 +137,16 @@ public class KMeansTest {
 	}
 
 	@Test
-	public void givenKArgumentOfN_whenGenerateCentroids_thenReturnsNCentroids() throws KMeansException {
+	public void whenGenerateClusters_thenKManyClusters() throws KMeansException {
 
 		Map<Color, List<Color>> clusters = kMeans.generateClusters();
 
 		int actualClusterCount = clusters.entrySet().size();	
 
+		System.out.println(clusters);
+
 		assertEquals(kMeans.getK(), actualClusterCount);
 
 	}
 
-
- 
 }

@@ -33,17 +33,26 @@ public class RgbKMeans {
 	private boolean isFit;
 
 	public RgbKMeans() {
+
 		this.clusters = new HashMap<>();
+		
 		this.centroids = new ArrayList<>();
+		
 		this.isFit = false;
+		
 	}
 
 	 
 	public void fit(List<Color> pixels, int K, double distance, int maxIters) {
+
 		this.pixels = pixels;
+
 		this.K = K;
+
 		this.maxIters = maxIters;
+
 		this.isFit = true;
+
 	}
 
 	public Map<Color, List<Color>> generateClusters() throws KMeansException {
@@ -56,11 +65,13 @@ public class RgbKMeans {
 
 		for (int i = 0; i < maxIters; i++) {
 
+			resetClusters();
+
 			for(Color pixel : pixels) {
 
 				Color centroid = findNearestCentroid(pixel);
 
-				assignPixelToCluster(pixel, centroid);
+				updateClusters(centroid, pixel);
 
 			}
 
@@ -90,7 +101,7 @@ public class RgbKMeans {
 
 	protected Color findNearestCentroid(Color pixel) throws KMeansException {
 
-		final double min = Double.MAX_VALUE;
+		double min = Double.MAX_VALUE;
 
 		Optional<Color> nearestCentroid = Optional.empty();
 
@@ -101,6 +112,8 @@ public class RgbKMeans {
 			if (distance < min) {
 
 				nearestCentroid = Optional.of(centroid);
+
+				min = distance;
 
 			}
 			
@@ -121,10 +134,24 @@ public class RgbKMeans {
 	}
 
 	/* Assignment made a side-effect so that I don't have to pass clusters as an argment */
-	protected void assignPixelToCluster(Color centroid, Color pixel) {
+	protected void updateClusters(Color centroid, Color pixel) {
 		
-		clusters.computeIfAbsent(centroid, k -> new ArrayList<>()).add(pixel);
+		clusters.get(centroid).add(pixel);
 
+	}
+
+	protected void resetClusters() {
+
+		Map<Color, List<Color>> newClusters = new HashMap<>();
+
+		for (Color centroid : centroids) {
+			
+			newClusters.put(centroid, new ArrayList<>());
+
+		}
+		
+		setClusters(newClusters);
+		
 	}
 
 
@@ -263,9 +290,7 @@ public class RgbKMeans {
 		this.maxIters = maxIters;
 	}
 
-
 }
-
 
 
 class KMeansException extends Exception {}

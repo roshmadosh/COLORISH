@@ -24,10 +24,10 @@ import java.awt.Dimension;
 public class App {
 
     public static void main(String[] args) throws IOException {
-		String imagePath = App.class.getClassLoader().getResource("react.png").getPath();
+		String imagePath = App.class.getClassLoader().getResource("siamese.jpg").getPath();
 		File file = new File(imagePath);
 		BufferedImage buf = ImageIO.read(file);
-		BufferedImage resized = resizeBufferedImage(buf, 50, 50);
+		BufferedImage resized = resizeBufferedImage(buf, 150, 150);
 
 		ImageIO.write(resized, "png", new File(imagePath));
 
@@ -39,9 +39,10 @@ public class App {
 		}
 
 		RgbKMeans rgbKMeans = new RgbKMeans();
-		rgbKMeans.fit(generatePixels(resized), 3, 10.00, 3);
+		rgbKMeans.fit(generatePixels(resized), 8, 10.00, 3);
 		try {
-			rgbKMeans.generateClusters();
+			Map<Color, List<Color>> clusters =	rgbKMeans.generateClusters();
+			System.out.println(rgbKMeans.getCentroids());
 		} catch (KMeansException e) {
 			e.printStackTrace();
 		}

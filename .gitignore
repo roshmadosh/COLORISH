@@ -6,3 +6,4 @@ build
 bin
 .project
 .settings/
+.idea
