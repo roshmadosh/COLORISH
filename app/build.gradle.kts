@@ -1,6 +1,5 @@
 plugins {
     java
-	
 	id("org.springframework.boot") version "2.7.8"
 }
 
@@ -14,6 +13,7 @@ repositories {
 dependencies {
     // Use JUnit Jupiter for testing.
     testImplementation("org.junit.jupiter:junit-jupiter:5.9.1")
+	testImplementation("org.springframework.boot:spring-boot-starter-test")
 
 	// spring boot
 	implementation("org.springframework.boot:spring-boot-starter-web")

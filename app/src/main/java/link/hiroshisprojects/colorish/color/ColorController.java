@@ -25,7 +25,7 @@ public class ColorController {
 	ColorService colorService;
 	
 	@GetMapping
-	public String pulseCheck() {
+	public String smokeTest() {
 
 		return "Color controller";
 

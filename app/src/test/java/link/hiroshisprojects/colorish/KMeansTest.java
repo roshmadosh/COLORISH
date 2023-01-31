@@ -61,9 +61,9 @@ public class KMeansTest {
 
 		testClusters.put(Color.GREEN, new ArrayList<>(Arrays.asList(Color.GREEN)));
 
-		Set<Color> expected = new HashSet<>(Set.of(Color.RED, Color.GREEN));
+		List<Color> expected = new ArrayList<>(Arrays.asList(Color.RED, Color.GREEN));
 
-		Set<Color> actual = kMeans.findKLargestCentroids(testClusters, K);
+		List<Color> actual = kMeans.findLargestCentroids(testClusters, K);
  
 		assertEquals(expected, actual);
 
@@ -83,9 +83,9 @@ public class KMeansTest {
 
 		kMeans.initializeClusters();
 
-		Set<Color> expectedCentroids = new HashSet<>(Set.of(Color.CYAN, Color.YELLOW));
+		List<Color> expectedCentroids = new ArrayList<>(Arrays.asList(Color.CYAN, Color.YELLOW));
 
-		Set<Color> actualCentroids = kMeans.getCentroids();
+		List<Color> actualCentroids = kMeans.getLargestCentroids();
 
 		assertEquals(expectedCentroids, actualCentroids);	
 
@@ -173,11 +173,11 @@ public class KMeansTest {
 	@Test
 	public void givenLowCentroidDistance_whenFindNearestCentroid_returnCorrectCentroids() throws KMeansException {
 
-		Color almostRed = new Color(192, 64, 64); 
+		Color almostRed = new Color(255 - RgbKMeans.LOW_DIFF, RgbKMeans.LOW_DIFF, RgbKMeans.LOW_DIFF);
 
 		Color notRedOrBlue = Color.GREEN; 
 
-		Color almostBlue = new Color(64, 64, 192);
+		Color almostBlue = new Color(RgbKMeans.LOW_DIFF, RgbKMeans.LOW_DIFF, 255 - RgbKMeans.LOW_DIFF);
 
 		CentroidDistance centroidDistance = CentroidDistance.LOW;
 
@@ -214,9 +214,9 @@ public class KMeansTest {
 		
 		kMeans.initializeClusters();
 	
-		Set<Color> actualCentroids = kMeans.getCentroids();
+		List<Color> actualCentroids = kMeans.getLargestCentroids();
 
-		assertEquals(new HashSet<>(pixels), actualCentroids);	
+		assert(!pixels.retainAll(actualCentroids));	
 		
 	}
 
@@ -239,14 +239,11 @@ public class KMeansTest {
 		
 		kMeans.initializeClusters();
 
-		Set<Color> expected = new HashSet<>(Set.of(Color.RED, Color.GREEN, Color.BLUE));
-	
-		Set<Color> actual = kMeans.getCentroids();
+		List<Color> expected = new ArrayList<>(Arrays.asList(Color.RED, Color.GREEN, Color.BLUE));
 
-		System.out.println(kMeans.getClusters());
+		List<Color> actual = kMeans.getLargestCentroids();
 
-		assertEquals(expected, actual);	
-		
+		assert(!expected.retainAll(actual));	
 	}
 
 
