@@ -18,7 +18,7 @@ import java.awt.Color;
 import java.io.IOException;
 
 @RestController
-@RequestMapping("/v1/api/color")
+@RequestMapping(ColorConstants.API_ENDPOINT)
 public class ColorController {
 
 	@Autowired
@@ -27,13 +27,15 @@ public class ColorController {
 	@GetMapping
 	public String smokeTest() {
 
-		return "Color controller";
+		return "Color Controller is working!";
 
 	}
 
 	@PostMapping(consumes = { MediaType.APPLICATION_JSON_VALUE,
 								MediaType.MULTIPART_FORM_DATA_VALUE })
-	public ResponseEntity<List<Color>> extractColors(@RequestParam("image") List<MultipartFile> files) {
+	public ResponseEntity<List<Color>> extractColors(@RequestParam(ColorConstants.FORM_REQUEST_PARAM) 
+													List<MultipartFile> files) {
+
 		try {
 
 			return ResponseEntity.ok(colorService.extractColors(files));
