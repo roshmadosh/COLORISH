@@ -11,9 +11,11 @@ import org.springframework.core.io.Resource;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.web.multipart.MultipartFile;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -22,6 +24,7 @@ import java.io.File;
 import java.io.FileInputStream;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import java.awt.Color;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -54,10 +57,15 @@ public class ColorControllerTest {
 			input
 		);
 
-		this.mockMvc.perform(MockMvcRequestBuilders
+		MvcResult result = this.mockMvc.perform(MockMvcRequestBuilders
 				.multipart(ColorConstants.API_ENDPOINT)
 				.file(multipart))		
-				.andExpect(status().isOk());	
+				.andExpect(status().isOk())
+				.andReturn();
 				
+		String content = result.getResponse().getContentAsString();
+
+		assertEquals(String.format("[%s]", Color.RED), content);
+
 	}
 }
