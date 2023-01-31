@@ -6,6 +6,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.imageio.ImageIO;
@@ -26,7 +27,7 @@ import java.awt.Dimension;
 public class App {
 
     public static void main(String[] args) throws IOException {
-		String imagePath = App.class.getClassLoader().getResource("siamese.jpg").getPath();
+		String imagePath = App.class.getClassLoader().getResource("japan.jpg").getPath();
 		File file = new File(imagePath);
 		BufferedImage buf = ImageIO.read(file);
 		BufferedImage resized = resizeBufferedImage(buf, 150, 150);
@@ -44,7 +45,7 @@ public class App {
 		rgbKMeans.fit(generatePixels(resized), 16, CentroidDistance.LOW, 1);
 		try {
 			rgbKMeans.initializeClusters();
-			System.out.println(rgbKMeans.getCentroids());
+			System.out.println(rgbKMeans.getLargestCentroids());
 		} catch (KMeansException e) {
 			e.printStackTrace();
 		}

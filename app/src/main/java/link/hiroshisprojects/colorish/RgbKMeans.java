@@ -36,6 +36,8 @@ public class RgbKMeans {
 
 	private Map<Color, List<Color>> clusters;
 
+	private List<Color> largestCentroids;
+
 	private List<Color> pixels;
 	
 	private double maxCentroidDistance;
@@ -49,6 +51,8 @@ public class RgbKMeans {
 	public RgbKMeans() {
 
 		this.clusters = new HashMap<>();
+
+		this.largestCentroids = new ArrayList<>();
 		
 		this.isFit = false;
 		
@@ -95,10 +99,11 @@ public class RgbKMeans {
 
 		}
 
-		Set<Color> kLargestCentroids = findKLargestCentroids(tempClusters, K);
+		List<Color> largestCentroids = findLargestCentroids(tempClusters, K);
 
-		
-		this.clusters = filterDownToKClusters(tempClusters, kLargestCentroids);
+		this.largestCentroids = largestCentroids;	
+
+		this.clusters = filterDownToKClusters(tempClusters, largestCentroids);
 
 	}
 
@@ -225,8 +230,8 @@ public class RgbKMeans {
 
 	}
 
-	/* Helper function for determining which clusters to filter out */
-	protected Set<Color> findKLargestCentroids(Map<Color, List<Color>> tempClusters, int K) {
+	/* Returns an ordered list of the largest centroids, i.e. the most prominent colors */
+	protected List<Color> findLargestCentroids(Map<Color, List<Color>> tempClusters, int K) {
 
 		List<Map.Entry<Color, List<Color>>> clusterList = new ArrayList<>();
 
@@ -246,17 +251,17 @@ public class RgbKMeans {
 
 		}
 
-		Set<Color> kLargestCentroids = clusterList.stream()
+		List<Color> largestCentroids = clusterList.stream()
 
 			.map(entry -> entry.getKey())
 
-			.collect(Collectors.toSet());
+			.collect(Collectors.toList());
 
-		return kLargestCentroids;
+		return largestCentroids;
 
 	}
 
-	protected Map<Color, List<Color>> filterDownToKClusters(Map<Color, List<Color>> tempClusters, Set<Color> kLargestCentroids) {
+	protected Map<Color, List<Color>> filterDownToKClusters(Map<Color, List<Color>> tempClusters, List<Color> largestCentroids) {
 
 		Map<Color, List<Color>> updatedClusters = new HashMap<>();
 
@@ -266,7 +271,7 @@ public class RgbKMeans {
 
 			List<Color> clusterValues = cluster.getValue();
 
-			if (kLargestCentroids.contains(centroid)) {
+			if (largestCentroids.contains(centroid)) {
 
 				updatedClusters.put(centroid, clusterValues);
 				
@@ -282,8 +287,8 @@ public class RgbKMeans {
 	}
 
 
-	public Set<Color> getCentroids() {
-		return this.clusters.keySet();
+	public List<Color> getLargestCentroids() {
+		return this.largestCentroids;
 	}
 
 
