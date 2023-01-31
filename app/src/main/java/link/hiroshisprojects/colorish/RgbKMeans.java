@@ -1,14 +1,13 @@
 package link.hiroshisprojects.colorish;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Random;
-
-
+import java.util.Set;
+import java.util.stream.Collectors;
 import java.awt.Color;
 
 /**
@@ -16,15 +15,30 @@ import java.awt.Color;
  * */
 public class RgbKMeans {
 
-	private static final Random RANDOM = new Random();
+	public static final int LOW_DIFF = 32;
+	public static final int MID_DIFF = 64;
+	public static final int MAX_DIFF = 96;
+	enum CentroidDistance {
+
+		EXACT(0),
+		LOW(Math.sqrt(Math.pow(LOW_DIFF, 2) * 3)),
+		MID(Math.sqrt(Math.pow(MID_DIFF, 2) * 3)),
+		MAX(Math.sqrt(Math.pow(MAX_DIFF, 2) * 3));
+
+		final double distance;
+
+		CentroidDistance(double distance) {
+			this.distance = distance;
+		}
+	}
+
+	// private static final Random RANDOM = new Random();
 
 	private Map<Color, List<Color>> clusters;
 
-	private List<Color> centroids;
-
 	private List<Color> pixels;
 	
-	private double distance;
+	private double maxCentroidDistance;
 
 	private int K;
 
@@ -36,18 +50,18 @@ public class RgbKMeans {
 
 		this.clusters = new HashMap<>();
 		
-		this.centroids = new ArrayList<>();
-		
 		this.isFit = false;
 		
 	}
 
 	 
-	public void fit(List<Color> pixels, int K, double distance, int maxIters) {
+	public void fit(List<Color> pixels, int K, CentroidDistance maxCentroidDistance, int maxIters) {
 
 		this.pixels = pixels;
 
 		this.K = K;
+
+		this.maxCentroidDistance = maxCentroidDistance.distance;
 
 		this.maxIters = maxIters;
 
@@ -55,51 +69,53 @@ public class RgbKMeans {
 
 	}
 
-	public Map<Color, List<Color>> generateClusters() throws KMeansException {
+	public void initializeClusters() throws KMeansException {
 
 		if (!isFit) 
 			
 			throw new KMeansException();
 
-		centroids = initializeCentroids();
+		Map<Color, List<Color>> tempClusters = generateInitialClusters(new ArrayList<>(this.pixels));
 
-		for (int i = 0; i < maxIters; i++) {
+		for (int i = 0; i < this.maxIters; i++) {
 
-			resetClusters();
+			tempClusters = resetValues(tempClusters);
 
-			for(Color pixel : pixels) {
+			for(Color pixel : this.pixels) {
 
-				Color centroid = findNearestCentroid(pixel);
+				Set<Color> centroids = tempClusters.keySet();
 
-				updateClusters(centroid, pixel);
+				Color centroid = findNearestCentroid(centroids, pixel, this.maxCentroidDistance);
+
+				tempClusters = addPixelToCluster(tempClusters, centroid, pixel);
 
 			}
 
-			centroids =	relocateCentroids();
+			tempClusters = relocateCentroids(tempClusters);
+
 		}
+
+		Set<Color> kLargestCentroids = findKLargestCentroids(tempClusters, K);
+
 		
-		return clusters;
+		this.clusters = filterDownToKClusters(tempClusters, kLargestCentroids);
 
 	}
 
-	/* Set centroids, randomly */
-	protected List<Color> initializeCentroids() throws KMeansException {
+	protected Map<Color, List<Color>> generateInitialClusters(List<Color> pixels) throws KMeansException {
 
-		List<Color> initialCentroids = new ArrayList<>();
+		Map<Color, List<Color>> initialClusters = new HashMap<>();
 
-		/* Push randomly generated colors into centroids list */
-		for (int i = 0; i < K; i++) {
+		Color initialCentroid = findMostCommonPixel(pixels);
 
-			int red = Math.round((RANDOM.nextFloat() * 255));
-			int green = Math.round((RANDOM.nextFloat() * 255));
-			int blue = Math.round((RANDOM.nextFloat() * 255));
-			
-			initialCentroids.add(new Color(red, green, blue));
+		initialClusters.put(initialCentroid, new ArrayList<>());
 
-		} return initialCentroids;
+		return initialClusters;
+
 	}
 
-	protected Color findNearestCentroid(Color pixel) throws KMeansException {
+
+	protected Color findNearestCentroid(Set<Color> centroids, Color pixel, double maxCentroidDistance) throws KMeansException {
 
 		double min = Double.MAX_VALUE;
 
@@ -117,14 +133,14 @@ public class RgbKMeans {
 
 			}
 			
-		} return nearestCentroid.orElseThrow(KMeansException::new);
+		} return min > maxCentroidDistance ? pixel : nearestCentroid.orElseThrow(KMeansException::new);
+		
 
 	}
 
-
+	/* Euclidean distance */
 	protected double calculateDistanceFromCentroid(Color centroid, Color pixel) {
 
-		/* Euclidean distance */
 		double reds = Math.pow(centroid.getRed() - pixel.getRed(), 2);	
 		double greens = Math.pow(centroid.getGreen() - pixel.getGreen(), 2);	
 		double blues = Math.pow(centroid.getBlue() - pixel.getBlue(), 2);	
@@ -133,58 +149,53 @@ public class RgbKMeans {
 		
 	}
 
-	/* Assignment made a side-effect so that I don't have to pass clusters as an argment */
-	protected void updateClusters(Color centroid, Color pixel) {
-		
-		clusters.get(centroid).add(pixel);
+	/* Add pixel to existing cluster, or create a new one and then add it */
+	protected Map<Color, List<Color>> addPixelToCluster(Map<Color, List<Color>> clusters, Color centroid, Color pixel) {
+
+		Map<Color, List<Color>> updatedClusters = new HashMap<>(clusters);	
+
+		updatedClusters.computeIfAbsent(centroid, key -> new ArrayList<Color>()).add(pixel);
+
+		return updatedClusters;
 
 	}
 
-	protected void resetClusters() {
+	/* Reset values for each centroid */
+	protected Map<Color, List<Color>> resetValues(Map<Color, List<Color>> clusters) {
 
 		Map<Color, List<Color>> newClusters = new HashMap<>();
+
+		Set<Color> centroids = clusters.keySet();
 
 		for (Color centroid : centroids) {
 			
 			newClusters.put(centroid, new ArrayList<>());
 
-		}
-		
-		setClusters(newClusters);
+		} return newClusters;
 		
 	}
 
 
 	/* Uses polling method to relocate centroid. */
-	private List<Color> relocateCentroids() throws KMeansException {
+	private Map<Color, List<Color>> relocateCentroids(Map<Color, List<Color>> tempClusters) throws KMeansException {
 
-		List<Color> updatedCentroids = new ArrayList<>();
+		Map<Color, List<Color>> updatedClusters = new HashMap<>();
 
-		for (Map.Entry<Color, List<Color>> cluster : clusters.entrySet()) {
+		for (Color centroid : tempClusters.keySet()) {
 
-			Color centroid = cluster.getKey();
+			List<Color> clusterValues = new HashMap<>(tempClusters).remove(centroid);
 
-			List<Color> pixels = cluster.getValue();
+			Color newCentroid = findMostCommonPixel(clusterValues);
 
-			if (pixels.isEmpty()) {
 
-				updatedCentroids.add(centroid);
+			updatedClusters.put(newCentroid, clusterValues);
+			
+		} return updatedClusters;
 
-				continue;
-
-			}
-
-			Color newCentroid = findMostCommonPixel(pixels);
-
-			updatedCentroids.add(newCentroid);
-
-		}
-		
-		return updatedCentroids;
 	} 
 
-	/* Like a valueCounts in Python */
-	private Color findMostCommonPixel(List<Color> pixels) throws KMeansException {
+
+	protected Color findMostCommonPixel(List<Color> pixels) throws KMeansException {
 
 		Map<Color, Integer> valueCounts = new HashMap<>();	
 
@@ -202,16 +213,6 @@ public class RgbKMeans {
 
 			int currentCount = valueCount.getValue();
 
-			if (mostCommonPixel.isEmpty()) {
-				
-				mostCommonPixel = Optional.of(currentPixel);
-
-				highestCount = 1;
-
-				continue;
-
-			}		
-
 			if (currentCount > highestCount) {
 
 				mostCommonPixel = Optional.of(currentPixel);
@@ -224,24 +225,70 @@ public class RgbKMeans {
 
 	}
 
+	/* Helper function for determining which clusters to filter out */
+	protected Set<Color> findKLargestCentroids(Map<Color, List<Color>> tempClusters, int K) {
+
+		List<Map.Entry<Color, List<Color>>> clusterList = new ArrayList<>();
+
+
+		/* Iterate through each key-value pair, add to list if among the K largest */
+		for (Map.Entry<Color, List<Color>> cluster : tempClusters.entrySet()) {
+			
+			clusterList.add(cluster);
+
+			if (clusterList.size() > K) {
+				
+				clusterList.sort((cluster1, cluster2) -> Integer.compare(cluster2.getValue().size(), cluster1.getValue().size()));
+
+				clusterList.remove(clusterList.size() - 1);
+
+			}
+
+		}
+
+		Set<Color> kLargestCentroids = clusterList.stream()
+
+			.map(entry -> entry.getKey())
+
+			.collect(Collectors.toSet());
+
+		return kLargestCentroids;
+
+	}
+
+	protected Map<Color, List<Color>> filterDownToKClusters(Map<Color, List<Color>> tempClusters, Set<Color> kLargestCentroids) {
+
+		Map<Color, List<Color>> updatedClusters = new HashMap<>();
+
+		for (Map.Entry<Color, List<Color>> cluster : tempClusters.entrySet()) {
+
+			Color centroid = cluster.getKey();
+
+			List<Color> clusterValues = cluster.getValue();
+
+			if (kLargestCentroids.contains(centroid)) {
+
+				updatedClusters.put(centroid, clusterValues);
+				
+			}
+
+		} return updatedClusters;
+
+	}
+
 
 	public Map<Color, List<Color>> getClusters() {
 		return clusters;
 	}
 
 
-	public List<Color> getCentroids() {
-		return centroids;
+	public Set<Color> getCentroids() {
+		return this.clusters.keySet();
 	}
 
 
 	public List<Color> getPixels() {
 		return pixels;
-	}
-
-
-	public double getDistance() {
-		return distance;
 	}
 
 
@@ -257,37 +304,6 @@ public class RgbKMeans {
 
 	public boolean isFit() {
 		return isFit;
-	}
-
-
-	public void setCentroids(List<Color> centroids) {
-
-		this.centroids = centroids;
-
-	}
-	public void setClusters(Map<Color, List<Color>> clusters) {
-
-		this.clusters = clusters;
-
-	}
-
-	public void setPixels(List<Color> pixels) {
-		this.pixels = pixels;
-	}
-
-
-	public void setDistance(double distance) {
-		this.distance = distance;
-	}
-
-
-	public void setK(int k) {
-		K = k;
-	}
-
-
-	public void setMaxIters(int maxIters) {
-		this.maxIters = maxIters;
 	}
 
 }

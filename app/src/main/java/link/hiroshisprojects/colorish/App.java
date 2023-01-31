@@ -12,6 +12,8 @@ import javax.imageio.ImageIO;
 
 import javax.swing.JFrame;
 
+import link.hiroshisprojects.colorish.RgbKMeans.CentroidDistance;
+
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -35,13 +37,13 @@ public class App {
 		List<Map.Entry<Color, Integer>> subset = sortedEntries.stream().limit(10).collect(Collectors.toList()); 
 		
 		for (Map.Entry<Color, Integer> entry : subset) {
-			System.out.println("COLOR: " + entry.getKey() + " COUNT " + entry.getValue());
+			// System.out.println("COLOR: " + entry.getKey() + " COUNT " + entry.getValue());
 		}
 
 		RgbKMeans rgbKMeans = new RgbKMeans();
-		rgbKMeans.fit(generatePixels(resized), 8, 10.00, 3);
+		rgbKMeans.fit(generatePixels(resized), 16, CentroidDistance.LOW, 1);
 		try {
-			Map<Color, List<Color>> clusters =	rgbKMeans.generateClusters();
+			rgbKMeans.initializeClusters();
 			System.out.println(rgbKMeans.getCentroids());
 		} catch (KMeansException e) {
 			e.printStackTrace();
