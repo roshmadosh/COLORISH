@@ -16,6 +16,7 @@ import java.awt.Color;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import link.hiroshisprojects.colorish.kmeans.RgbKMeans.CentroidDistance;
@@ -39,8 +40,9 @@ public class KMeansTest {
 		
 	}
 
+	@DisplayName("Invoking initializeClusters() before invoking fit() throws an exception.")
 	@Test
-	public void initalizeClustersBeforeFit_throwsException() {
+	public void initalizeClusters_throwsException() {
 
 		RgbKMeans kMeans = new RgbKMeans();
 
@@ -49,8 +51,9 @@ public class KMeansTest {
 
 	}
 
+	@DisplayName("findLargestCentroids() returns correct number of centroids and in decreasing size order")
 	@Test
-	public void givenClustersOfVaryingSize_findKLargestCentroids_returnsExpected() {
+	public void findKLargestCentroids_order() {
 
 		int K = 2;
 
@@ -70,8 +73,9 @@ public class KMeansTest {
 
 	}
 
+	@DisplayName("initalizeClusters() returns correct number of clusters and in decreasing size order")
 	@Test
-	public void givenK_initializeClusters_yieldsCentroidsWithKMostCommonPixels() throws KMeansException {
+	public void initializeClusters_order() throws KMeansException {
 
 		int K = 2;
 
@@ -88,12 +92,13 @@ public class KMeansTest {
 
 		List<Color> actualCentroids = kMeans.getLargestCentroids();
 
-		assertThat(expectedCentroids).hasSameElementsAs(actualCentroids);
+		assertEquals(expectedCentroids, actualCentroids);
 
 	}
 
+	@DisplayName("findMostCommonPixel() returns a red pixel when given mostly red pixels.")
 	@Test
-	public void givenMostlyRedPixels_findMostCommonPixels_returnsRedPixel() throws KMeansException {
+	public void findMostCommonPixel_() throws KMeansException {
 		
 		List<Color> pixels = new ArrayList<>();
 
@@ -108,8 +113,9 @@ public class KMeansTest {
 		assertEquals(Color.RED, pixel);
 	}
 
+	@DisplayName("generateInitialClusters() returns a red cluster when given mostly red pixels.")
 	@Test
-	public void givenMostlyRedPixels_generateInitialClusters_returnsRedCluster() throws KMeansException {
+	public void generateInitialClusters_() throws KMeansException {
 
 		List<Color> pixels = new ArrayList<>();
 
@@ -131,8 +137,9 @@ public class KMeansTest {
 
 	}
 
+	@DisplayName("resetValues() resets cluster values to empty lists.")
 	@Test
-	public void givenNonEmptyClusterValues_resetValues_returnsEmptyClusterValues() {
+	public void resetValues_() {
 
 		Map<Color, List<Color>> initClusters = new HashMap<>();
 
@@ -152,8 +159,9 @@ public class KMeansTest {
 
 	}
 
+	@DisplayName("findNearestCentroid() returns the pixel itself when pixel != centroid for any centroid and CentroidDistance.EXACT.")
 	@Test
-	public void givenExactCentroidDistanceAndNoExactCentroidMatch_whenFindNearestCentroid_returnsPixel() throws KMeansException {
+	public void findNearestCentroid_nonMatchWithExact() throws KMeansException {
 
 		Color pixel = Color.PINK;
 
@@ -171,8 +179,9 @@ public class KMeansTest {
 		
 	}
 
+	@DisplayName("findNearestCentroid() returns expected centroid with CentroidDistance.LOW.")
 	@Test
-	public void givenLowCentroidDistance_whenFindNearestCentroid_returnCorrectCentroids() throws KMeansException {
+	public void findNearestCentroid_similarWithLow() throws KMeansException {
 
 		Color almostRed = new Color(255 - RgbKMeans.LOW_DIFF, RgbKMeans.LOW_DIFF, RgbKMeans.LOW_DIFF);
 
@@ -206,8 +215,9 @@ public class KMeansTest {
 
 	}
 
+	@DisplayName("initializeClusters() returns all unique pixel colors as centroids when CentroidDistance.EXACT.")
 	@Test
-	public void givenExactCentroidDistance_whenInitializeClusters_thenCentroidsContainAllUniqueColorsInPixels() throws KMeansException {
+	public void initializeClusters_exact() throws KMeansException {
 
 		List<Color> pixels = new ArrayList<>(Arrays.asList(Color.RED, new Color(255, 1, 0), new Color(255, 0, 1)));
 
@@ -225,8 +235,9 @@ public class KMeansTest {
 		
 	}
 
+	@DisplayName("initializeClusters() forms N clusters when given N-many pairs of similar pixels.")
 	@Test
-	public void givenNPairsOfSimilarColors_initializeClusters_formsNClusters() throws KMeansException {
+	public void initializeClusters_NPairs() throws KMeansException {
 
 		List<Color> pixels = new ArrayList<>(Arrays.asList(Color.RED, Color.GREEN, Color.BLUE));
 		pixels.add(Color.RED);
