@@ -1,19 +1,16 @@
 package link.hiroshisprojects.colorish.color;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
-import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.web.multipart.MultipartFile;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -22,6 +19,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import java.awt.Color;
@@ -30,10 +30,17 @@ import java.awt.Color;
 @AutoConfigureMockMvc
 public class ColorControllerTest {
 
+	private Resource redImage;
 	
 	@Autowired
-	MockMvc mockMvc;
+	private MockMvc mockMvc;
 
+	@BeforeEach() 
+	public void init(){
+
+		redImage = new ClassPathResource("solidRed.png");
+
+	}
 
 	@Test
 	public void GET_smokeTest_returnsString() throws Exception {
@@ -46,13 +53,11 @@ public class ColorControllerTest {
 	@Test
 	public void POST_givenRedImage_extractColors_returnsListWithColorRed() throws Exception {
 
-		Resource resource = new ClassPathResource("solidRed.png");
-
-		File file = new File(resource.getURI());
+		File file = new File(redImage.getURI());
 		
 		FileInputStream input = new FileInputStream(file);
 
-		MockMultipartFile multipart = new MockMultipartFile(ColorConstants.FORM_REQUEST_PARAM, 
+		MockMultipartFile multipart = new MockMultipartFile(ColorConstants.FORM_REQUEST_PARAMS_1, 
 			file.getName(), "multipart/form-data", 
 			input
 		);
@@ -65,7 +70,13 @@ public class ColorControllerTest {
 				
 		String content = result.getResponse().getContentAsString();
 
-		assertEquals(String.format("[%s]", Color.RED), content);
+		ColorDTO redDto = new ColorDTO(Color.RED);
+
+		List<ColorDTO> colorsList = new ArrayList<>(Arrays.asList(redDto));
+
+		List<List<ColorDTO>> expected = new ArrayList<>(Arrays.asList(colorsList));
+
+		assertEquals(String.format("[%s]", new ColorDTO(Color.RED)), content);
 
 	}
 }

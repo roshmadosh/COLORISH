@@ -1,11 +1,10 @@
-package link.hiroshisprojects.colorish;
+package link.hiroshisprojects.colorish.kmeans;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Random;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.awt.Color;
@@ -18,14 +17,14 @@ public class RgbKMeans {
 	public static final int LOW_DIFF = 32;
 	public static final int MID_DIFF = 64;
 	public static final int MAX_DIFF = 96;
-	enum CentroidDistance {
+	public enum CentroidDistance {
 
 		EXACT(0),
 		LOW(Math.sqrt(Math.pow(LOW_DIFF, 2) * 3)),
 		MID(Math.sqrt(Math.pow(MID_DIFF, 2) * 3)),
 		MAX(Math.sqrt(Math.pow(MAX_DIFF, 2) * 3));
 
-		final double distance;
+		public final double distance;
 
 		CentroidDistance(double distance) {
 			this.distance = distance;
@@ -314,4 +313,3 @@ public class RgbKMeans {
 }
 
 
-class KMeansException extends Exception {}

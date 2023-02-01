@@ -1,4 +1,4 @@
-package link.hiroshisprojects.colorish;
+package link.hiroshisprojects.colorish.kmeans;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.awt.Color;
 
@@ -17,7 +18,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import link.hiroshisprojects.colorish.RgbKMeans.CentroidDistance;
+import link.hiroshisprojects.colorish.kmeans.RgbKMeans.CentroidDistance;
 
 public class KMeansTest {
 
@@ -87,7 +88,7 @@ public class KMeansTest {
 
 		List<Color> actualCentroids = kMeans.getLargestCentroids();
 
-		assertEquals(expectedCentroids, actualCentroids);	
+		assertThat(expectedCentroids).hasSameElementsAs(actualCentroids);
 
 	}
 
@@ -193,12 +194,16 @@ public class KMeansTest {
 		
 		Color actualNeither = kMeans.findNearestCentroid(centroids, notRedOrBlue, centroidDistance.distance);
 
-		assertEquals(Color.RED, actualAlmostRed);
+		assertAll(
 
-		assertEquals(Color.BLUE, actualAlmostBlue);
+			() -> assertEquals(Color.RED, actualAlmostRed), 
 
-		assertEquals(Color.GREEN, actualNeither);
-		
+			() -> assertEquals(Color.BLUE, actualAlmostBlue), 
+
+			() -> assertEquals(notRedOrBlue, actualNeither) 
+
+		);
+
 	}
 
 	@Test
@@ -216,7 +221,7 @@ public class KMeansTest {
 	
 		List<Color> actualCentroids = kMeans.getLargestCentroids();
 
-		assert(!pixels.retainAll(actualCentroids));	
+		assertThat(pixels).hasSameElementsAs(actualCentroids);
 		
 	}
 
@@ -243,27 +248,8 @@ public class KMeansTest {
 
 		List<Color> actual = kMeans.getLargestCentroids();
 
-		assert(!expected.retainAll(actual));	
+		assertThat(expected).hasSameElementsAs(actual);	
+
 	}
-
-
-	// @Test
-	// public void givenMaxCentroidDistance_whenInitializeClusters_thenSingleCentroid() throws KMeansException {
-
-	// 	List<Color> pixels = new ArrayList<>(Arrays.asList(Color.RED, Color.BLUE, Color.GREEN));
-
-	// 	CentroidDistance centroidDistance = CentroidDistance.MAX;
-
-	// 	int K = pixels.size();
-
-	// 	kMeans.fit(pixels, K, centroidDistance, defaultMaxIters);
-		
-	// 	kMeans.initializeClusters();
-	
-	// 	Set<Color> actualCentroids = kMeans.getCentroids();
-
-	// 	assertEquals(1, actualCentroids.size());	
-		
-	// }
 	
 }

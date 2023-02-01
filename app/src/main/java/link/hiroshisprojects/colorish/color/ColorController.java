@@ -33,12 +33,11 @@ public class ColorController {
 
 	@PostMapping(consumes = { MediaType.APPLICATION_JSON_VALUE,
 								MediaType.MULTIPART_FORM_DATA_VALUE })
-	public ResponseEntity<List<Color>> extractColors(@RequestParam(ColorConstants.FORM_REQUEST_PARAM) 
-													List<MultipartFile> files) {
+	public ResponseEntity<List<List<ColorDTO>>> extractColors(
+		@RequestParam(name = ColorConstants.FORM_REQUEST_PARAMS_1) List<MultipartFile> files
+	) {		
 
-		try {
-
-			return ResponseEntity.ok(colorService.extractColors(files));
+		try { return ResponseEntity.ok(colorService.extractColors(files));
 
 		} catch (IOException ioe) {
 
