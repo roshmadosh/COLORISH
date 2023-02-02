@@ -8,5 +8,5 @@ workflows:
   checkout-build-test:
     jobs:
       - gradle/test:
-          test_results_path: build/test-results/test
+          test_results_path: app/build/test-results/test
 
