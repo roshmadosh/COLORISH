@@ -5,8 +5,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
@@ -34,11 +32,6 @@ public class ColorGeneratorTest {
 		
 	}
 
-	@DisplayName("Intentional fail to see what's displayed on CircleCI.'")
-	@Test
-	public void circleci() {
-		assertEquals(200, 1);	
-	}
 	
 	@Test
 	public void givenSolidRedImage_whenGenerateColors_thenListOfColorRed() throws IOException {
