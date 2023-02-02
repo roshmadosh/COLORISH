@@ -70,13 +70,10 @@ public class ColorControllerTest {
 				
 		String content = result.getResponse().getContentAsString();
 
-		ColorDTO redDto = new ColorDTO(Color.RED);
+		String expected = "[[{\"red\":255,\"green\":0,\"blue\":0}]]";
 
-		List<ColorDTO> colorsList = new ArrayList<>(Arrays.asList(redDto));
-
-		List<List<ColorDTO>> expected = new ArrayList<>(Arrays.asList(colorsList));
-
-		assertEquals(String.format("[%s]", new ColorDTO(Color.RED)), content);
+		assertEquals(expected, content);
 
 	}
+
 }

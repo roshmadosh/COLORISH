@@ -5,6 +5,12 @@ plugins {
 
 apply(plugin = "io.spring.dependency-management")
 
+java {
+	toolchain {
+		languageVersion.set(JavaLanguageVersion.of(11))
+	}
+}
+
 repositories {
     // Use Maven Central for resolving dependencies.
     mavenCentral()
