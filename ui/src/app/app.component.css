@@ -1,0 +1,28 @@
+.header-content {
+	
+	display: grid;
+
+	grid-template-columns: repeat(5, 1fr);
+
+}
+
+.header-element {
+
+	padding: 2ch;
+
+}
+
+nav.header-element {
+
+	grid-column: 2/5;
+
+}
+
+nav.header-element > ul {
+
+	display: flex;
+
+	justify-content: space-between;
+
+}
+
