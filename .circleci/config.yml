@@ -9,3 +9,7 @@ workflows:
     jobs:
       - gradle/test:
           test_results_path: build/test-results/
+
+steps:
+  - store_test_results:
+      path: test-results   
