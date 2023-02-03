@@ -6,6 +6,7 @@ build
 bin
 
 # compiled output
+public
 /dist
 /tmp
 /out-tsc
