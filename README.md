@@ -7,7 +7,7 @@
 <span style="font-size: 48px, color: #1c6373">S</span>
 <span style="font-size: 48px, color: #2a4858">H</span>
 ---
-[![CircleCI](https://dl.circleci.com/status-badge/img/gh/roshmadosh/COLORISH/tree/main.svg?style=svg)](https://dl.circleci.com/status-badge/redirect/gh/roshmadosh/COLORISH/tree/main)  
+[![CircleCI](https://dl.circleci.com/status-badge/img/gh/roshmadosh/COLORISH/tree/dev.svg?style=svg)](https://dl.circleci.com/status-badge/redirect/gh/roshmadosh/COLORISH/tree/dev)  
 
 A web application where the user uploads an image, and the most prominent colors in that image are used to theme the page.  
 
